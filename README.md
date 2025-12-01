@@ -37,7 +37,6 @@ When running the backend on localhost the hub simulator cannot reach `http://loc
 1. Start the backend (`npm run dev` in `backend`).
 2. Run a tunnel (e.g. `ngrok http 3001`).
 3. Configure the Webhook Manager to point at the public tunnel URL plus the webhook path, e.g. `https://abc123.ngrok.io/api/receive-stock`.
-4. Ensure `HUB_WEBHOOK_SECRET` in `.env` matches the secret shown in the Webhook Manager so signature verification succeeds.
 
 ## Design decisions
 
@@ -45,7 +44,7 @@ When running the backend on localhost the hub simulator cannot reach `http://loc
 - **Idempotent webhook**: `POST /webhook/receive-stock` locks the purchase request row (serializable transaction). If already COMPLETED, returns skipped; if PENDING, it upserts stock per warehouse/product and flips status to COMPLETED.
 - **ACID handling**: Creation/update/deletion of PRs and webhook stock application all run inside Sequelize transactions to keep items, requests, and stock consistent.
 - **Reference generation**: PR references follow `PR00001` based on the DB id for uniqueness without a separate sequence.
-- **Sequelize CLI compatibility**: ESM runtime uses `src/config/config.js`, while CLI uses `src/config/config.cjs` via `.sequelizerc` so migrations/seeds work under `type: module`.
+- **Sequelize CLI compatibility**: ESM runtime and CLI uses `src/config/config.cjs` via `.sequelizerc` so migrations/seeds work under `type: module`.
 - **Frontend UX**: Single-page dashboard for stocks, PR list, creation form, and detail editing. Error banners surface API errors; status chips color-code lifecycle; actions disable when status disallows edits.
 
 ## Possible improvements
